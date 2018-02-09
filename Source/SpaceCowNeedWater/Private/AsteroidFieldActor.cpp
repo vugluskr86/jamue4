@@ -9,7 +9,7 @@ AAsteroidFieldActor::AAsteroidFieldActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+   /*
    AsteroidActorClass = nullptr;
    MinAsteroid = 10;
    MaxAsteroid = 100;
@@ -17,6 +17,7 @@ AAsteroidFieldActor::AAsteroidFieldActor()
    MaxScale = 10.0f;
    MinPosDispersion = 200.0f;
    MaxPosDispersion = 1000.0f;
+   */
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +25,7 @@ void AAsteroidFieldActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+   Build();
 }
 
 // Called every frame
@@ -33,22 +35,41 @@ void AAsteroidFieldActor::Tick(float DeltaTime)
 
 }
 
-void AAsteroidFieldActor::Build(UWorld* world)
+void AAsteroidFieldActor::Build()
 {
-   FVector SpawnPosVector;
-   SpawnPosVector.X = FMath::FRandRange(MinPosDispersion, MaxPosDispersion);
-   SpawnPosVector.Y = FMath::FRandRange(MinPosDispersion, MaxPosDispersion);
-   SpawnPosVector.Z = FMath::FRandRange(MinPosDispersion, MaxPosDispersion);
+   for (int i = 0; i < FieldDef.Num(); i++) {
+      auto def = FieldDef[i];
 
-   FVector ScaleVector;
-   SpawnPosVector.X = FMath::FRandRange(MinScale, MaxScale);
-   SpawnPosVector.Y = FMath::FRandRange(MinScale, MaxScale);
-   SpawnPosVector.Z = FMath::FRandRange(MinScale, MaxScale);
+      const int32 AsteroidCount = FMath::FRandRange(def.MinAsteroid, def.MaxAsteroid);
 
-   const int32 AsteroidCount = FMath::FRandRange(MinAsteroid, MaxAsteroid);
+      UWorld* world = this->GetWorld();
 
-   for (int32 i = 0; i < AsteroidCount; i++) {
-      //world->SpawnActor<AActor>(AsteroidActorClass, SpawnPosVector, FRotator(0, 0, 0), SpawnInfo);
+     // UE_LOG(LogTemp, Log, TEXT("AAsteroidFieldActor::Build()"));
+
+      for (int32 i = 0; i < AsteroidCount; i++) {
+         FVector SpawnPosVector;
+         SpawnPosVector.X = FMath::FRandRange(def.MinPosDispersion, def.MaxPosDispersion);
+         SpawnPosVector.Y = FMath::FRandRange(def.MinPosDispersion, def.MaxPosDispersion);
+         SpawnPosVector.Z = FMath::FRandRange(def.MinPosDispersion, def.MaxPosDispersion);
+
+         float scale = FMath::FRandRange(def.MinScale, def.MaxScale);
+
+         FVector ScaleVector;
+         ScaleVector.X = scale * FMath::FRandRange(0.8, 1.2);
+         ScaleVector.Y = scale * FMath::FRandRange(0.8, 1.2);
+         ScaleVector.Z = scale * FMath::FRandRange(0.8, 1.2);
+
+       //  UE_LOG(LogTemp, Log, TEXT("POS %f %f %f"), SpawnPosVector.X, SpawnPosVector.Y, SpawnPosVector.Z);
+
+         FActorSpawnParameters SpawnInfo;
+         SpawnInfo.Owner = this;
+
+         // world->SpawnActor<AActor>(AsteroidActorClass, SpawnPosVector,)
+
+         AActor* act = world->SpawnActor<AActor>(def.AsteroidActorClass, SpawnPosVector, FRotator(0, 0, 0), SpawnInfo);
+         act->SetActorScale3D(ScaleVector);
+      }
    }
+
 }
 
