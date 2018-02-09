@@ -16,7 +16,8 @@ ASpaceCowNeedWaterPawn::ASpaceCowNeedWaterPawn()
 	{
 		ConstructorHelpers::FObjectFinderOptional<UStaticMesh> PlaneMesh;
 		FConstructorStatics()
-			: PlaneMesh(TEXT("/Game/Flying/Meshes/UFO.UFO"))
+			: PlaneMesh(TEXT("/Game/Flying/Meshes/UFO/SM_UFO_Main"))
+			//: PlaneMesh(TEXT("/Game/Blueprints/UFO.UFO"))
 		{
 		}
 	};
@@ -44,14 +45,14 @@ ASpaceCowNeedWaterPawn::ASpaceCowNeedWaterPawn()
 	Acceleration = 500.f;
 	TurnSpeed = 50.f;
 	MaxSpeed = 4000.f;
-	MinSpeed = 500.f;
+	MinSpeed = 0.f;
 	CurrentForwardSpeed = 500.f;
 }
 
 void ASpaceCowNeedWaterPawn::Tick(float DeltaSeconds)
 {
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
-
+/*
 	// Move plan forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
 
@@ -63,6 +64,7 @@ void ASpaceCowNeedWaterPawn::Tick(float DeltaSeconds)
 
 	// Rotate plane
 	AddActorLocalRotation(DeltaRotation);
+*/
 
 	// Call any parent class Tick implementation
 	Super::Tick(DeltaSeconds);
@@ -74,7 +76,7 @@ void ASpaceCowNeedWaterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class 
 
 	// Deflect along the surface when we collide.
 	FRotator CurrentRotation = GetActorRotation();
-	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	//SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
 }
 
 
@@ -82,11 +84,12 @@ void ASpaceCowNeedWaterPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 {
     // Check if PlayerInputComponent is valid (not NULL)
 	check(PlayerInputComponent);
-
+/*
 	// Bind our control axis' to callback functions
 	PlayerInputComponent->BindAxis("Thrust", this, &ASpaceCowNeedWaterPawn::ThrustInput);
 	PlayerInputComponent->BindAxis("MoveUp", this, &ASpaceCowNeedWaterPawn::MoveUpInput);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASpaceCowNeedWaterPawn::MoveRightInput);
+	*/
 }
 
 void ASpaceCowNeedWaterPawn::ThrustInput(float Val)
