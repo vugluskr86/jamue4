@@ -5,6 +5,8 @@
 #include "GameFramework/Pawn.h"
 #include "SpaceCowNeedWaterPawn.generated.h"
 
+class ARockActor;
+
 UCLASS(Config=Game)
 class ASpaceCowNeedWaterPawn : public APawn
 {
@@ -44,6 +46,8 @@ protected:
 	/** Bound to the horizontal axis */
 	void MoveRightInput(float Val);
 
+   void MouseLeftClickInput();
+   
 private:
 
 	/** How quickly forward speed changes */
@@ -73,6 +77,8 @@ private:
 
 	/** Current roll speed */
 	float CurrentRollSpeed;
+
+   TSubclassOf<ARockActor> RockActorClass;
 
 public:
 	/** Returns PlaneMesh subobject **/

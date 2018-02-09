@@ -9,6 +9,11 @@
 #include "Engine/World.h"
 #include "Engine/StaticMesh.h"
 
+#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
+
+#include "Public/DifferentMix.h"
+#include "Public/RockActor.h"
+
 ASpaceCowNeedWaterPawn::ASpaceCowNeedWaterPawn()
 {
 	// Structure to hold one-time initialization
@@ -22,6 +27,12 @@ ASpaceCowNeedWaterPawn::ASpaceCowNeedWaterPawn()
 		}
 	};
 	static FConstructorStatics ConstructorStatics;
+
+	static ConstructorHelpers::FClassFinder<ARockActor> RockActorBPClass(TEXT("/Game/Blueprints/BP_RockActor"));
+
+	if (RockActorBPClass.Succeeded()) {
+		RockActorClass = RockActorBPClass.Class;
+	} 
 
 	// Create static mesh component
 	PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
@@ -84,12 +95,14 @@ void ASpaceCowNeedWaterPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 {
     // Check if PlayerInputComponent is valid (not NULL)
 	check(PlayerInputComponent);
-/*
-	// Bind our control axis' to callback functions
-	PlayerInputComponent->BindAxis("Thrust", this, &ASpaceCowNeedWaterPawn::ThrustInput);
-	PlayerInputComponent->BindAxis("MoveUp", this, &ASpaceCowNeedWaterPawn::MoveUpInput);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ASpaceCowNeedWaterPawn::MoveRightInput);
-	*/
+	PlayerInputComponent->BindAction("MouseLeftClicked", IE_Pressed, this, &ASpaceCowNeedWaterPawn::MouseLeftClickInput);   
+}
+
+void ASpaceCowNeedWaterPawn::MouseLeftClickInput()
+{
+   FActorSpawnParameters SpawnInfo;
+   SpawnInfo.Owner = this;
+   GetWorld()->SpawnActor<ARockActor>(RockActorClass, FVector(5000.0f, 0.0f, -70.0f), FRotator(0, 0, 0), SpawnInfo);
 }
 
 void ASpaceCowNeedWaterPawn::ThrustInput(float Val)

@@ -68,3 +68,6 @@ DerivedDataCache/*
 .ctrlp_cache/
 .vs/
 SpaceCowNeedWater/Intermediate/
+Content/UFOGameDemo/
+Content/GameJamKit/VectorFields/VF_AccessTunnel_MachineSource_200.uasset
+Content/GameJamKit/
