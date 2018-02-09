@@ -6,8 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "DifferentMix.generated.h"
 
-
 class ARockActor;
+class AGameModeBase;
 
 /**
  * 
@@ -16,8 +16,14 @@ UCLASS()
 class SPACECOWNEEDWATER_API UDifferentMix : public UObject
 {
 	GENERATED_BODY()
-	
-   ARockActor* RookActorpProt_;
-	
-	
+   UDifferentMix(const FObjectInitializer& ObjectInitializer);
+
+public:
+   static ARockActor* RookActorpProt_;
+
+   static UDifferentMix* Singeleton_;
+   static AGameModeBase* GameMode_;
+
+   static UDifferentMix* GetInstance()
+   { return UDifferentMix::Singeleton_; }
 };

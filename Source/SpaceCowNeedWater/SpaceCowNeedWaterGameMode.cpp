@@ -3,8 +3,14 @@
 #include "SpaceCowNeedWaterGameMode.h"
 #include "SpaceCowNeedWaterPawn.h"
 
+#include "Public/DifferentMix.h"
+
 ASpaceCowNeedWaterGameMode::ASpaceCowNeedWaterGameMode()
 {
 	// set default pawn class to our flying pawn
 	DefaultPawnClass = ASpaceCowNeedWaterPawn::StaticClass();
+
+   UDifferentMix::Singeleton_ = NewObject<UDifferentMix>(UDifferentMix::StaticClass());
+
+   UDifferentMix::GameMode_ = this;
 }
