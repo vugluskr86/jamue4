@@ -102,7 +102,6 @@ void AInstancedAsteroidsFieldActor::Build()
 
 void AInstancedAsteroidsFieldActor::BuildCube(const FAsteroidInstancedFieldDef_Cube& options) 
 {
-
    //FActorSpawnParameters SpawnInfo;
   // SpawnInfo.Owner = this;
 
@@ -141,27 +140,31 @@ void AInstancedAsteroidsFieldActor::BuildSphere(const FAsteroidInstancedFieldDef
    ISMComp->SetStaticMesh(options.AsteroidStaticMeshClass);
    ISMComp->SetFlags(RF_Transactional);
 
-   auto r_step = (options.Radius * 2.0f) / options.Count;
-   for (int32 x = -options.Radius; x < options.Radius; x += r_step) {
-      for (int32 y = -options.Radius; y < options.Radius; y += r_step) {
-         for (int32 z = -options.Radius; z < options.Radius; z += r_step) {
+   for (int32 i = 0; i < options.Count; i++) {
 
-            FVector SpawnPosVector;
-            SpawnPosVector.X = x * options.Distance;
-            SpawnPosVector.Y = y * options.Distance;
-            SpawnPosVector.Z = z * options.Distance;
+      auto phi = FMath::FRandRange(0.0, 2.0 * PI);
+      auto costheta = FMath::FRandRange(-1.0, 1.0);
+      auto u = FMath::FRandRange(0.0, 1.0);
 
-            if(x*x + y*y + z*z < options.Radius * options.Radius) {
-              
-               UE_LOG(LogTemp, Log, TEXT("POS %f %f %f"), SpawnPosVector.X, SpawnPosVector.Y, SpawnPosVector.Z);
+      auto theta = acos(costheta);
+      auto r = options.Radius * u * u * u;
 
-               FTransform Transform(SpawnPosVector);
+      auto x = r * sin(theta) * cos(phi);
+      auto y = r * sin(theta) * sin(phi);
+      auto z = r * cos(theta);
 
-               ISMComp->AddInstance(Transform);
-            }
+      auto scale = options.Properties.MinScale;
 
-         }
-      }
+      const FVector ScaleVector(
+         scale * FMath::FRandRange(0.8, 1.2),
+         scale * FMath::FRandRange(0.8, 1.2),
+         scale * FMath::FRandRange(0.8, 1.2)
+      );
+      const FRotator Rotator = FRandomRotator();
+      const FVector SpawnPosVector(x, y, z);
+
+      FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
+      ISMComp->AddInstance(Transform);
    }
 
    InstancedStaticMeshes.Add(ISMComp);
@@ -175,31 +178,41 @@ void AInstancedAsteroidsFieldActor::BuildTorus(const FAsteroidInstancedFieldDef_
    ISMComp->SetStaticMesh(options.AsteroidStaticMeshClass);
    ISMComp->SetFlags(RF_Transactional);
 
-   auto r_step = (options.Radius * 2.0f) / options.Count;
-   for (int32 x = -options.Radius; x < options.Radius; x += r_step) {
-      for (int32 y = -options.Radius; y < options.Radius; y += r_step) {
-         for (int32 z = -options.Radius; z < options.Radius; z += r_step) {
 
-            FVector SpawnPosVector;
-            SpawnPosVector.X = x * options.Distance;
-            SpawnPosVector.Y = y * options.Distance;
-            SpawnPosVector.Z = z * options.Distance;
+   for (int32 i = 0; i < options.Count; i++) {
 
-            auto xy = (sqrt(x*x + y*y) - options.Radius);
-            auto left = xy * xy + z * z;
+      auto phi = FMath::FRandRange(0.0, 2.0 * PI);
+      auto costheta = FMath::FRandRange(-1.0, 1.0);
+      auto u = FMath::FRandRange(0.0, 1.0);
 
-            if (left < options.Radius2 * options.Radius2) {
+      auto theta = acos(costheta);
+      auto r = options.Radius2 * u * u * u;
 
-               UE_LOG(LogTemp, Log, TEXT("POS %f %f %f"), SpawnPosVector.X, SpawnPosVector.Y, SpawnPosVector.Z);
+      auto x = (options.Radius + r * cos(theta)) * cos(phi);
+      auto y = (options.Radius + r * cos(theta)) * sin(phi);
+      auto z = r * sin(theta);
 
-               FTransform Transform(SpawnPosVector);
+      auto scale = options.Properties.MinScale;
 
-               ISMComp->AddInstance(Transform);
-            }
+      const FVector ScaleVector(
+         scale * FMath::FRandRange(0.8, 1.2),
+         scale * FMath::FRandRange(0.8, 1.2),
+         scale * FMath::FRandRange(0.8, 1.2)
+      );
+      const FRotator Rotator = FRandomRotator();
+      const FVector SpawnPosVector(x, y, z);
 
-         }
-      }
+      FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
+      ISMComp->AddInstance(Transform);
    }
 
    InstancedStaticMeshes.Add(ISMComp);
+}
+
+FRotator AInstancedAsteroidsFieldActor::FRandomRotator()
+{
+   const float pitch = FMath::FRandRange(-180.f, 180.f);
+   const float yaw = FMath::FRandRange(-180.f, 180.f);
+   const float roll = FMath::FRandRange(-180.f, 180.f);
+   return FRotator(pitch, yaw, roll);
 }

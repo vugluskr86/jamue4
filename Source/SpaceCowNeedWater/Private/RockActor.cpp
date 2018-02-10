@@ -18,20 +18,24 @@ void ARockActor::BeginPlay()
 
    UStaticMeshComponent* root = Cast<UStaticMeshComponent>(this->GetRootComponent());
    
-   FVector ImpulseVector;
-   ImpulseVector.X = FMath::FRandRange(0.0, 100.0);
-   ImpulseVector.Y = FMath::FRandRange(0.0, 100.0);
-   ImpulseVector.Z = FMath::FRandRange(0.0, 100.0);
+   FVector TorqueVector;
+   TorqueVector.X = FMath::FRandRange(-100, 100);
+   TorqueVector.Y = FMath::FRandRange(-100, 100);
+   TorqueVector.Z = FMath::FRandRange(-100, 100);
 
-   root->AddTorque(ImpulseVector, NAME_None, true);
+   root->AddTorqueInRadians(TorqueVector, NAME_None, true);
+
+   FVector ImpulseVector;
+   ImpulseVector.X = FMath::FRandRange(1, 10);
+   ImpulseVector.Y = FMath::FRandRange(1, 10);
+   ImpulseVector.Z = FMath::FRandRange(1, 10);
+   root->AddImpulse(ImpulseVector, NAME_None, true);
 }
 
 // Called every frame
 void ARockActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-   UE_LOG(LogTemp, Log, TEXT("ARockActor::Tick()"));
 
    UStaticMeshComponent* root = Cast<UStaticMeshComponent>(this->GetRootComponent());
    

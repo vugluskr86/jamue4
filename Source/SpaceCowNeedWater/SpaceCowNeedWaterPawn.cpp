@@ -11,7 +11,6 @@
 
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 
-#include "Public/DifferentMix.h"
 #include "Public/RockActor.h"
 
 ASpaceCowNeedWaterPawn::ASpaceCowNeedWaterPawn()
@@ -95,7 +94,7 @@ void ASpaceCowNeedWaterPawn::SetupPlayerInputComponent(class UInputComponent* Pl
 {
     // Check if PlayerInputComponent is valid (not NULL)
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("MouseLeftClicked", IE_Pressed, this, &ASpaceCowNeedWaterPawn::MouseLeftClickInput);   
+//	PlayerInputComponent->BindAction("MouseLeftClicked", IE_Pressed, this, &ASpaceCowNeedWaterPawn::MouseLeftClickInput);   
 }
 
 void ASpaceCowNeedWaterPawn::MouseLeftClickInput()

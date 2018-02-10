@@ -75,8 +75,6 @@ struct FAsteroidInstancedFieldDef_Sphere
       float DistanceDisperse;
 };
 
-
-
 USTRUCT(BlueprintType)
 struct FAsteroidInstancedFieldDef_Torus
 {
@@ -124,6 +122,8 @@ protected:
    void BuildCube(const FAsteroidInstancedFieldDef_Cube& options);
    void BuildSphere(const FAsteroidInstancedFieldDef_Sphere& options);
    void BuildTorus(const FAsteroidInstancedFieldDef_Torus& options);
+
+   FRotator FRandomRotator();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -131,13 +131,9 @@ public:
    UPROPERTY(EditAnywhere)
       TArray<FAsteroidInstancedFieldDef_Cube> CubeDefs;
 
-   UPROPERTY(EditAnywhere)
-      TArray<FAsteroidInstancedFieldDef_Sphere> SphereDefs;
+   UPROPERTY(EditAnywhere) TArray<FAsteroidInstancedFieldDef_Sphere> SphereDefs;
 
-   UPROPERTY(EditAnywhere)
-      TArray<FAsteroidInstancedFieldDef_Torus> TorusDefs;
+   UPROPERTY(EditAnywhere) TArray<FAsteroidInstancedFieldDef_Torus> TorusDefs;
    
-
-   UFUNCTION(BlueprintCallable)
-      void Build();
+   UFUNCTION(BlueprintCallable) void Build();
 };

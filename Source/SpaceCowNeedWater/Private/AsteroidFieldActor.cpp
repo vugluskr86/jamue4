@@ -2,8 +2,6 @@
 
 #include "AsteroidFieldActor.h"
 
-#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
-
 // Sets default values
 AAsteroidFieldActor::AAsteroidFieldActor()
 {
@@ -15,8 +13,6 @@ AAsteroidFieldActor::AAsteroidFieldActor()
 void AAsteroidFieldActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
-   Build();
 }
 
 // Called every frame
@@ -25,6 +21,7 @@ void AAsteroidFieldActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+/*
 void AAsteroidFieldActor::Build()
 {
    for (int i = 0; i < FieldDef.Num(); i++) {
@@ -62,4 +59,4 @@ void AAsteroidFieldActor::Build()
    }
 
 }
-
+*/
