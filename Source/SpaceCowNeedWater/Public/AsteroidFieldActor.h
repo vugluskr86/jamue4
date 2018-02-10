@@ -54,29 +54,6 @@ public:
    UPROPERTY(EditAnywhere)
    TArray<FAsteroidFieldDef> FieldDef;
 
-   /*
-   UPROPERTY(EditAnywhere)
-   TSubclassOf<class AActor> AsteroidActorClass;
-
-   UPROPERTY(EditAnywhere)
-   int32 MinAsteroid;
-
-   UPROPERTY(EditAnywhere)
-   int32 MaxAsteroid;
-
-   UPROPERTY(EditAnywhere)
-   float MinScale;
-
-   UPROPERTY(EditAnywhere)
-   float MaxScale;
-
-   UPROPERTY(EditAnywhere)
-   float MinPosDispersion;
-
-   UPROPERTY(EditAnywhere)
-   float MaxPosDispersion;
-   */
-
    UFUNCTION(BlueprintCallable)
    void Build();
 };

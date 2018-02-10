@@ -9,15 +9,6 @@ AAsteroidFieldActor::AAsteroidFieldActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-   /*
-   AsteroidActorClass = nullptr;
-   MinAsteroid = 10;
-   MaxAsteroid = 100;
-   MinScale = 0.1f;
-   MaxScale = 10.0f;
-   MinPosDispersion = 200.0f;
-   MaxPosDispersion = 1000.0f;
-   */
 }
 
 // Called when the game starts or when spawned
@@ -32,7 +23,6 @@ void AAsteroidFieldActor::BeginPlay()
 void AAsteroidFieldActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AAsteroidFieldActor::Build()
