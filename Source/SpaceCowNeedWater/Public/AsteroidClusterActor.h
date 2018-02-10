@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include<random>
+#include<cmath>
+#include<chrono>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -44,6 +48,9 @@ public:
 	AAsteroidClusterActor();
 
 protected:  
+   std::mt19937 generator;
+   std::uniform_real_distribution<double> uniform01;
+
    FRotator FRandomRotator();
 
    void SpawnInstanced(const FAsteroidInstancedSpawnParamsCluster& params);
