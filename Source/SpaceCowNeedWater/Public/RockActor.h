@@ -16,7 +16,11 @@ public:
 	ARockActor();
 
 protected:
-	// Called when the game starts or when spawned
+	
+   FVector RotateImpulseVector;
+   int32 _forceCouner;
+
+   // Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	

@@ -18,18 +18,20 @@ void ARockActor::BeginPlay()
 
    UStaticMeshComponent* root = Cast<UStaticMeshComponent>(this->GetRootComponent());
    
-   FVector TorqueVector;
-   TorqueVector.X = FMath::FRandRange(-100, 100);
-   TorqueVector.Y = FMath::FRandRange(-100, 100);
-   TorqueVector.Z = FMath::FRandRange(-100, 100);
+   if (root) {
+      FVector TorqueVector;
+      TorqueVector.X = FMath::FRandRange(-100, 100);
+      TorqueVector.Y = FMath::FRandRange(-100, 100);
+      TorqueVector.Z = FMath::FRandRange(-100, 100);
 
-   root->AddTorqueInRadians(TorqueVector, NAME_None, true);
+      root->AddTorqueInRadians(TorqueVector, NAME_None, true);
 
-   FVector ImpulseVector;
-   ImpulseVector.X = FMath::FRandRange(1, 10);
-   ImpulseVector.Y = FMath::FRandRange(1, 10);
-   ImpulseVector.Z = FMath::FRandRange(1, 10);
-   root->AddImpulse(ImpulseVector, NAME_None, true);
+      FVector ImpulseVector;
+      ImpulseVector.X = FMath::FRandRange(1, 10);
+      ImpulseVector.Y = FMath::FRandRange(1, 10);
+      ImpulseVector.Z = FMath::FRandRange(1, 10);
+      root->AddImpulse(ImpulseVector, NAME_None, true);
+   }
 }
 
 // Called every frame
@@ -37,9 +39,9 @@ void ARockActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-   UStaticMeshComponent* root = Cast<UStaticMeshComponent>(this->GetRootComponent());
+   //UStaticMeshComponent* root = Cast<UStaticMeshComponent>(this->GetRootComponent());
    
-   FVector Origin;
-   root->AddRadialForce(GetActorLocation(), 100.f, 1000.f, ERadialImpulseFalloff::RIF_Constant, true);
+   //FVector Origin;
+   //root->AddRadialForce(GetActorLocation(), 100.f, 1000.f, ERadialImpulseFalloff::RIF_Constant, true);
 }
 

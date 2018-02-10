@@ -52,6 +52,8 @@ FRotator AAsteroidClusterActor::FRandomRotator()
 
 void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCluster& params)
 {
+   FTransform local = GetTransform();
+
    UInstancedStaticMeshComponent *ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
 
    ISMComp->RegisterComponent();
@@ -82,8 +84,9 @@ void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCl
          scale * FMath::FRandRange(0.8, 1.2)
       );
       const FRotator Rotator = FRandomRotator();
-      const FVector SpawnPosVector(x, y, z);
-
+      const FVector SpawnPosVector = local.GetTranslation() + FVector(x, y, z);
+ 
+      
       FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
       ISMComp->AddInstance(Transform);
    }
@@ -91,10 +94,9 @@ void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCl
 
 void AAsteroidClusterActor::SpawnActors(const FAsteroidActorSpawnParamsCluster& params)
 {
+   FTransform local = GetTransform();
    const int32 AsteroidCount = FMath::FRandRange(params.MinAsteroid, params.MaxAsteroid);
    UWorld* world = this->GetWorld();
-
-   UE_LOG(LogTemp, Log, TEXT("AAsteroidClusterActor::SpawnActors = AsteroidCount %d"), AsteroidCount);
 
    for (int32 i = 0; i < AsteroidCount; i++) {
 
@@ -116,7 +118,7 @@ void AAsteroidClusterActor::SpawnActors(const FAsteroidActorSpawnParamsCluster& 
          scale * FMath::FRandRange(0.8, 1.2),
          scale * FMath::FRandRange(0.8, 1.2)
       );
-      const FVector SpawnPosVector(x, y, z);
+      const FVector SpawnPosVector = local.GetTranslation() + FVector(x, y, z);
  
       FActorSpawnParameters SpawnInfo;
       SpawnInfo.Owner = this;

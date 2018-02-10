@@ -16,9 +16,8 @@ struct FAsteroidInstancedSpawnParamsRing
    UPROPERTY(EditAnywhere) UMaterial* Material;
    UPROPERTY(EditAnywhere) int32 MinAsteroid;
    UPROPERTY(EditAnywhere) int32 MaxAsteroid;
-   UPROPERTY(EditAnywhere) float Radius;
-   UPROPERTY(EditAnywhere) float Radius2;
-   UPROPERTY(EditAnywhere) float Distance;
+   UPROPERTY(EditAnywhere) float OuterRadius;
+   UPROPERTY(EditAnywhere) float InnerRadius;
    UPROPERTY(EditAnywhere) float MinScale;
    UPROPERTY(EditAnywhere) float MaxScale;
 };
@@ -32,9 +31,8 @@ struct FAsteroidActorsSpawnParamsRing
    UPROPERTY(EditAnywhere) TSubclassOf<class AActor> ActorClass;
    UPROPERTY(EditAnywhere) int32 MinAsteroid;
    UPROPERTY(EditAnywhere) int32 MaxAsteroid;
-   UPROPERTY(EditAnywhere) float Radius;
-   UPROPERTY(EditAnywhere) float Radius2;
-   UPROPERTY(EditAnywhere) float Distance;
+   UPROPERTY(EditAnywhere) float OuterRadius;
+   UPROPERTY(EditAnywhere) float InnerRadius;
    UPROPERTY(EditAnywhere) float MinScale;
    UPROPERTY(EditAnywhere) float MaxScale;
 };
@@ -49,6 +47,8 @@ public:
 	AAsteroidRingActor();
 
 protected:
+
+   FVector GetRandomPositionInTorus(double ringRadius, double wallRadius);
 
    FRotator FRandomRotator();
 

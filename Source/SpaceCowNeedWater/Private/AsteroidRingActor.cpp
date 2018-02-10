@@ -3,6 +3,9 @@
 #include "AsteroidRingActor.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
+#include<random>
+#include<cmath>
+#include<chrono>
 
 // Sets default values
 AAsteroidRingActor::AAsteroidRingActor()
@@ -50,6 +53,8 @@ void AAsteroidRingActor::Spawn()
 
 void AAsteroidRingActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsRing& options)
 {
+   FTransform local = GetTransform();
+
    UInstancedStaticMeshComponent *ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
 
    ISMComp->RegisterComponent();
@@ -59,51 +64,54 @@ void AAsteroidRingActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsRing&
    
    const int32 AsteroidCount = FMath::FRandRange(options.MinAsteroid, options.MaxAsteroid);
 
+   auto wallRadius = (options.OuterRadius - options.InnerRadius) * 0.5f;
+   auto ringRadius = wallRadius + options.InnerRadius; // ( ( max - min ) / 2 ) + min
+
    for (int32 i = 0; i < AsteroidCount; i++) {
-
-      auto phi = FMath::FRandRange(0.0, 2.0 * PI);
-      auto costheta = FMath::FRandRange(-1.0, 1.0);
-      auto u = FMath::FRandRange(0.0, 1.0);
-
-      auto theta = acos(costheta);
-      auto r = options.Radius2 * u * u * u;
-
-      auto x = (options.Radius + r * cos(theta)) * cos(phi);
-      auto y = (options.Radius + r * cos(theta)) * sin(phi);
-      auto z = r * sin(theta);
-
       auto scale = FMath::FRandRange(options.MinScale, options.MaxScale);
-
-      const FVector ScaleVector(
-         scale * FMath::FRandRange(0.8, 1.2),
-         scale * FMath::FRandRange(0.8, 1.2),
-         scale * FMath::FRandRange(0.8, 1.2)
-      );
+      const FVector ScaleVector(scale, scale, scale);
       const FRotator Rotator = FRandomRotator();
-      const FVector SpawnPosVector(x, y, z);
-
+      const FVector SpawnPosVector = local.GetTranslation() + GetRandomPositionInTorus(ringRadius, wallRadius);
       FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
       ISMComp->AddInstance(Transform);
    }
 }
 
+FVector AAsteroidRingActor::GetRandomPositionInTorus(double ringRadius, double wallRadius)
+{
+   auto rndAngle = FMath::FRandRange(0.0, 6.28); 
+
+   auto cX = sin(rndAngle);
+   auto cZ = cos(rndAngle);
+
+   FVector ringPos(cX, 0, cZ);
+   ringPos *= ringRadius;
+
+   auto phi = FMath::FRandRange(0.0, 2.0 * PI);
+   auto costheta = FMath::FRandRange(-1.0, 1.0);
+   auto u = FMath::FRandRange(0.0, 1.0);
+   auto theta = acos(costheta);
+   auto x = sin(theta) * cos(phi);
+   auto y = sin(theta) * sin(phi);
+   auto z = cos(theta);
+
+   FVector sPos = FVector(x, y, z) * wallRadius;
+
+   return (ringPos + sPos);
+}
+
 void AAsteroidRingActor::SpawnActors(const FAsteroidActorsSpawnParamsRing& options)
 {
+   FTransform local = GetTransform();
+
    UWorld* world = this->GetWorld();
    const int32 AsteroidCount = FMath::FRandRange(options.MinAsteroid, options.MaxAsteroid);
 
+   auto wallRadius = (options.OuterRadius - options.InnerRadius) * 0.5f;
+   auto ringRadius = wallRadius + options.InnerRadius;
+
    for (int32 i = 0; i < AsteroidCount; i++) {
 
-      auto phi = FMath::FRandRange(0.0, 2.0 * PI);
-      auto costheta = FMath::FRandRange(-1.0, 1.0);
-      auto u = FMath::FRandRange(0.0, 1.0);
-
-      auto theta = acos(costheta);
-      auto r = options.Radius2 * u * u * u;
-
-      auto x = (options.Radius + r * cos(theta)) * cos(phi);
-      auto y = (options.Radius + r * cos(theta)) * sin(phi);
-      auto z = r * sin(theta);
 
       auto scale = FMath::FRandRange(options.MinScale, options.MaxScale);
 
@@ -112,7 +120,7 @@ void AAsteroidRingActor::SpawnActors(const FAsteroidActorsSpawnParamsRing& optio
          scale * FMath::FRandRange(0.8, 1.2),
          scale * FMath::FRandRange(0.8, 1.2)
       );
-      const FVector SpawnPosVector(x, y, z);
+      const FVector SpawnPosVector = local.GetTranslation() + GetRandomPositionInTorus(ringRadius, wallRadius);
 
       FActorSpawnParameters SpawnInfo;
       SpawnInfo.Owner = this;
