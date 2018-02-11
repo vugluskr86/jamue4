@@ -47,7 +47,7 @@ void AAsteroidRingActor::Spawn()
    TArray<UInstancedStaticMeshComponent*> InstancedList;
    GetComponents(InstancedList);
    for (int i = 0; i < InstancedList.Num(); i++) {
-      InstancedList[i]->DestroyComponent(true);
+      InstancedList[i]->DestroyComponent(false);
    }
 
    for (int i = 0; i < aAsteroidActors.Num(); i++) {
@@ -73,6 +73,7 @@ void AAsteroidRingActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsRing&
 
    UInstancedStaticMeshComponent *ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
 
+
    ISMComp->RegisterComponent();
    ISMComp->SetStaticMesh(options.StaticMesh);
    ISMComp->SetMaterial(0, UMaterialInstanceDynamic::Create(options.Material, this));
@@ -88,7 +89,7 @@ void AAsteroidRingActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsRing&
       auto scale = options.MinScale + (options.MaxScale * uniform01(generator));
       const FVector ScaleVector(scale, scale, scale);
       const FRotator Rotator = FRandomRotator();
-      const FVector SpawnPosVector = local.GetTranslation() + GetRandomPositionInTorus(ringRadius, wallRadius);
+      const FVector SpawnPosVector = PivoiPos + GetRandomPositionInTorus(ringRadius, wallRadius);
       FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
       ISMComp->AddInstance(Transform);
    }
@@ -136,12 +137,15 @@ void AAsteroidRingActor::SpawnActors(const FAsteroidActorsSpawnParamsRing& optio
          scale * (0.8 + (1.2 * uniform01(generator))),
          scale * (0.8 + (1.2 * uniform01(generator)))
       );
-      const FVector SpawnPosVector = local.GetTranslation() + GetRandomPositionInTorus(ringRadius, wallRadius);
+      const FVector SpawnPosVector = PivoiPos + GetRandomPositionInTorus(ringRadius, wallRadius);
 
       FActorSpawnParameters SpawnInfo;
       SpawnInfo.Owner = this;
 
       AActor* act = world->SpawnActor<AActor>(options.ActorClass, SpawnPosVector, FRotator(0, 0, 0), SpawnInfo);
+      
+      //act->Tags.Add("");
+
       act->SetActorScale3D(ScaleVector);
       aAsteroidActors.Add(act);
    }

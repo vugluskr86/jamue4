@@ -7,7 +7,7 @@
 
 
 // Sets default values
-AAsteroidClusterActor::AAsteroidClusterActor()
+AAsteroidClusterActor::AAsteroidClusterActor() : Seed(0), PivoiPos(0,0,0)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -38,11 +38,15 @@ void AAsteroidClusterActor::Spawn()
    TArray<UInstancedStaticMeshComponent*> InstancedList;
    GetComponents(InstancedList);
    for (int i = 0; i < InstancedList.Num(); i++) {
-      InstancedList[i]->DestroyComponent(true);
+      if (InstancedList[i]) {
+         InstancedList[i]->DestroyComponent(false);
+      }
    }
 
    for (int i = 0; i < aAsteroidActors.Num(); i++) {
-        aAsteroidActors[i]->Destroy();
+      if (aAsteroidActors[i]) {
+         aAsteroidActors[i]->Destroy();
+      }
    }
    
    aAsteroidActors.Empty();
@@ -68,8 +72,7 @@ FRotator AAsteroidClusterActor::FRandomRotator()
 
 void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCluster& params)
 {
-   FTransform local = GetTransform();
-
+ 
    const int32 AsteroidCount = params.MinAsteroid + (params.MaxAsteroid * uniform01(generator));
    
    if (AsteroidCount > 0) {
@@ -77,17 +80,18 @@ void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCl
       UE_LOG(LogTemp, Log, TEXT("AAsteroidClusterActor::SpawnInstanced() %d"), AsteroidCount);
 
       UInstancedStaticMeshComponent *ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
-
+      
+   //   ISMComp->SetWorldTransform(local);
       ISMComp->RegisterComponent();
       ISMComp->SetStaticMesh(params.StaticMesh);
       ISMComp->SetMaterial(0, UMaterialInstanceDynamic::Create(params.Material, this));
       ISMComp->SetFlags(RF_Transactional);
-
+   
       for (int32 i = 0; i < AsteroidCount; i++) {
 
          double theta = 2 * PI * uniform01(generator);
          double phi = PI * uniform01(generator);
-         auto r = params.Radius * uniform01(generator);
+         auto r = (params.Radius * 0.1) + params.Radius * uniform01(generator);
 
          auto x = r * sin(theta) * cos(phi);
          auto y = r * sin(theta) * sin(phi);
@@ -101,7 +105,7 @@ void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCl
             scale * (0.8 + (1.2 * uniform01(generator)))
          );
          const FRotator Rotator = FRandomRotator();
-         const FVector SpawnPosVector = local.GetTranslation() + FVector(x, y, z);
+         const FVector SpawnPosVector = PivoiPos + FVector(x, y, z);
 
 
          FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
@@ -124,7 +128,7 @@ void AAsteroidClusterActor::SpawnActors(const FAsteroidActorSpawnParamsCluster& 
 
          double theta = 2 * PI * uniform01(generator);
          double phi = PI * uniform01(generator);
-         auto r = params.Radius * uniform01(generator);
+         auto r = (params.Radius * 0.1) + params.Radius * uniform01(generator);
 
          auto x = r * sin(theta) * cos(phi);
          auto y = r * sin(theta) * sin(phi);
@@ -137,11 +141,11 @@ void AAsteroidClusterActor::SpawnActors(const FAsteroidActorSpawnParamsCluster& 
             scale * (0.8 + (1.2 * uniform01(generator))),
             scale * (0.8 + (1.2 * uniform01(generator)))
          );
-         const FVector SpawnPosVector = local.GetTranslation() + FVector(x, y, z);
+         const FVector SpawnPosVector = PivoiPos + FVector(x, y, z);
 
          FActorSpawnParameters SpawnInfo;
          SpawnInfo.Owner = this;
-
+        
          AActor* act = world->SpawnActor<AActor>(params.ActorClass, SpawnPosVector, FRotator(0, 0, 0), SpawnInfo);
          act->SetActorScale3D(ScaleVector);
          aAsteroidActors.Add(act);
