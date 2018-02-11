@@ -72,6 +72,7 @@ public:
    virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
+   UPROPERTY(EditAnywhere) FVector PivoiPos;
    UPROPERTY(EditAnywhere) int32 Seed;
    UPROPERTY(EditAnywhere) TArray<FAsteroidInstancedSpawnParamsCluster> InstancedSpawn;
    UPROPERTY(EditAnywhere) TArray<FAsteroidActorSpawnParamsCluster> ActorsSpawn;
