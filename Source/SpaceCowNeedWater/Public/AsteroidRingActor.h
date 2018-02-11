@@ -2,10 +2,15 @@
 
 #pragma once
 
+#include<random>
+#include<cmath>
+#include<chrono>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "AsteroidRingActor.generated.h"
+
 
 USTRUCT(BlueprintType)
 struct FAsteroidInstancedSpawnParamsRing
@@ -47,9 +52,12 @@ public:
 	AAsteroidRingActor();
 
 protected:
+   std::mt19937 generator;
+   std::uniform_real_distribution<double> uniform01;
 
    FVector GetRandomPositionInTorus(double ringRadius, double wallRadius);
 
+   TArray<AActor*> aAsteroidActors;
    FRotator FRandomRotator();
 
    void SpawnInstanced(const FAsteroidInstancedSpawnParamsRing& options);
@@ -62,6 +70,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+#if WITH_EDITOR  
+   virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+   UPROPERTY(EditAnywhere) int32 Seed;
    UPROPERTY(EditAnywhere) TArray<FAsteroidInstancedSpawnParamsRing> InstancedSpawn;
    UPROPERTY(EditAnywhere) TArray<FAsteroidActorsSpawnParamsRing> ActorsSpawn;
    UFUNCTION(BlueprintCallable) void Spawn();

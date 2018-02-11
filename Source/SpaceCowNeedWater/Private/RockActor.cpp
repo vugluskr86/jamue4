@@ -45,3 +45,8 @@ void ARockActor::Tick(float DeltaTime)
    //root->AddRadialForce(GetActorLocation(), 100.f, 1000.f, ERadialImpulseFalloff::RIF_Constant, true);
 }
 
+
+void ARockActor::PostInitializeComponents()
+{
+   Super::PostInitializeComponents();
+}

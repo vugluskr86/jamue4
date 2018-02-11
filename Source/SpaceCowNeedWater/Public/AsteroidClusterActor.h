@@ -51,6 +51,7 @@ protected:
    std::mt19937 generator;
    std::uniform_real_distribution<double> uniform01;
 
+   TArray<AActor*> aAsteroidActors;
    FRotator FRandomRotator();
 
    void SpawnInstanced(const FAsteroidInstancedSpawnParamsCluster& params);
@@ -63,6 +64,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+   virtual void PostInitializeComponents() override;
+   
+   virtual void OnConstruction(const FTransform& transform) override;
+
+#if WITH_EDITOR  
+   virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+   UPROPERTY(EditAnywhere) int32 Seed;
    UPROPERTY(EditAnywhere) TArray<FAsteroidInstancedSpawnParamsCluster> InstancedSpawn;
    UPROPERTY(EditAnywhere) TArray<FAsteroidActorSpawnParamsCluster> ActorsSpawn;
    UFUNCTION(BlueprintCallable) void Spawn();
