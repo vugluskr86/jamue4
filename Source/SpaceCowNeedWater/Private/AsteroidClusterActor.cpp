@@ -82,6 +82,7 @@ void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCl
       UInstancedStaticMeshComponent *ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
       
    //   ISMComp->SetWorldTransform(local);
+      
       ISMComp->RegisterComponent();
       ISMComp->SetStaticMesh(params.StaticMesh);
       ISMComp->SetMaterial(0, UMaterialInstanceDynamic::Create(params.Material, this));
