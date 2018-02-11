@@ -12,6 +12,8 @@ AAsteroidClusterActor::AAsteroidClusterActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+   generator = std::mt19937(Seed);
+   uniform01 = std::uniform_real_distribution<double>(0.0, 1.0);
 }
 
 // Called when the game starts or when spawned
@@ -31,6 +33,20 @@ void AAsteroidClusterActor::Tick(float DeltaTime)
 
 void AAsteroidClusterActor::Spawn()
 {
+   generator.seed(Seed);
+
+   TArray<UInstancedStaticMeshComponent*> InstancedList;
+   GetComponents(InstancedList);
+   for (int i = 0; i < InstancedList.Num(); i++) {
+      InstancedList[i]->DestroyComponent(true);
+   }
+
+   for (int i = 0; i < aAsteroidActors.Num(); i++) {
+        aAsteroidActors[i]->Destroy();
+   }
+   
+   aAsteroidActors.Empty();
+
    for (int i = 0; i < InstancedSpawn.Num(); i++) {
       auto def = InstancedSpawn[i];
       SpawnInstanced(def);
@@ -52,76 +68,105 @@ FRotator AAsteroidClusterActor::FRandomRotator()
 
 void AAsteroidClusterActor::SpawnInstanced(const FAsteroidInstancedSpawnParamsCluster& params)
 {
-   UInstancedStaticMeshComponent *ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
+   FTransform local = GetTransform();
 
-   ISMComp->RegisterComponent();
-   ISMComp->SetStaticMesh(params.StaticMesh);
-   ISMComp->SetMaterial(0, UMaterialInstanceDynamic::Create(params.Material, this));
-   ISMComp->SetFlags(RF_Transactional);
+   const int32 AsteroidCount = params.MinAsteroid + (params.MaxAsteroid * uniform01(generator));
+   
+   if (AsteroidCount > 0) {
 
-   const int32 AsteroidCount = FMath::FRandRange(params.MinAsteroid, params.MaxAsteroid);
+      UE_LOG(LogTemp, Log, TEXT("AAsteroidClusterActor::SpawnInstanced() %d"), AsteroidCount);
 
-   for (int32 i = 0; i < AsteroidCount; i++) {
+      UInstancedStaticMeshComponent *ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
 
-      auto phi = FMath::FRandRange(0.0, 2.0 * PI);
-      auto costheta = FMath::FRandRange(-1.0, 1.0);
-      auto u = FMath::FRandRange(0.0, 1.0);
+      ISMComp->RegisterComponent();
+      ISMComp->SetStaticMesh(params.StaticMesh);
+      ISMComp->SetMaterial(0, UMaterialInstanceDynamic::Create(params.Material, this));
+      ISMComp->SetFlags(RF_Transactional);
 
-      auto theta = acos(costheta);
-      auto r = params.Radius * u;
+      for (int32 i = 0; i < AsteroidCount; i++) {
 
-      auto x = r * sin(theta) * cos(phi);
-      auto y = r * sin(theta) * sin(phi);
-      auto z = r * cos(theta);
+         double theta = 2 * PI * uniform01(generator);
+         double phi = PI * uniform01(generator);
+         auto r = params.Radius * uniform01(generator);
 
-      auto scale = FMath::FRandRange(params.MinScale, params.MaxScale);
+         auto x = r * sin(theta) * cos(phi);
+         auto y = r * sin(theta) * sin(phi);
+         auto z = r * cos(theta);
 
-      const FVector ScaleVector(
-         scale * FMath::FRandRange(0.8, 1.2),
-         scale * FMath::FRandRange(0.8, 1.2),
-         scale * FMath::FRandRange(0.8, 1.2)
-      );
-      const FRotator Rotator = FRandomRotator();
-      const FVector SpawnPosVector(x, y, z);
+         auto scale = params.MinScale + (params.MaxScale * uniform01(generator)); 
 
-      FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
-      ISMComp->AddInstance(Transform);
+         const FVector ScaleVector(
+            scale * (0.8 + (1.2 * uniform01(generator))),
+            scale * (0.8 + (1.2 * uniform01(generator))),
+            scale * (0.8 + (1.2 * uniform01(generator)))
+         );
+         const FRotator Rotator = FRandomRotator();
+         const FVector SpawnPosVector = local.GetTranslation() + FVector(x, y, z);
+
+
+         FTransform Transform(Rotator, SpawnPosVector, ScaleVector);
+         ISMComp->AddInstance(Transform);
+      }
    }
 }
 
 void AAsteroidClusterActor::SpawnActors(const FAsteroidActorSpawnParamsCluster& params)
 {
-   const int32 AsteroidCount = FMath::FRandRange(params.MinAsteroid, params.MaxAsteroid);
+   FTransform local = GetTransform();
+   const int32 AsteroidCount = params.MinAsteroid + (params.MaxAsteroid * uniform01(generator));
    UWorld* world = this->GetWorld();
 
-   UE_LOG(LogTemp, Log, TEXT("AAsteroidClusterActor::SpawnActors = AsteroidCount %d"), AsteroidCount);
+   if (AsteroidCount) {
 
-   for (int32 i = 0; i < AsteroidCount; i++) {
+      UE_LOG(LogTemp, Log, TEXT("AAsteroidClusterActor::SpawnActors() %d"), AsteroidCount);
 
-      auto phi = FMath::FRandRange(0.0, 2.0 * PI);
-      auto costheta = FMath::FRandRange(-1.0, 1.0);
-      auto u = FMath::FRandRange(0.0, 1.0);
+      for (int32 i = 0; i < AsteroidCount; i++) {
 
-      auto theta = acos(costheta);
-      auto r = params.Radius * u;
+         double theta = 2 * PI * uniform01(generator);
+         double phi = PI * uniform01(generator);
+         auto r = params.Radius * uniform01(generator);
 
-      auto x = r * sin(theta) * cos(phi);
-      auto y = r * sin(theta) * sin(phi);
-      auto z = r * cos(theta);
+         auto x = r * sin(theta) * cos(phi);
+         auto y = r * sin(theta) * sin(phi);
+         auto z = r * cos(theta);
 
-      auto scale = FMath::FRandRange(params.MinScale, params.MaxScale);
+         auto scale = params.MinScale + (params.MaxScale * uniform01(generator));
 
-      const FVector ScaleVector(
-         scale * FMath::FRandRange(0.8, 1.2),
-         scale * FMath::FRandRange(0.8, 1.2),
-         scale * FMath::FRandRange(0.8, 1.2)
-      );
-      const FVector SpawnPosVector(x, y, z);
- 
-      FActorSpawnParameters SpawnInfo;
-      SpawnInfo.Owner = this;
+         const FVector ScaleVector(
+            scale * (0.8 + (1.2 * uniform01(generator))),
+            scale * (0.8 + (1.2 * uniform01(generator))),
+            scale * (0.8 + (1.2 * uniform01(generator)))
+         );
+         const FVector SpawnPosVector = local.GetTranslation() + FVector(x, y, z);
 
-      AActor* act = world->SpawnActor<AActor>(params.ActorClass, SpawnPosVector, FRotator(0, 0, 0), SpawnInfo);
-      act->SetActorScale3D(ScaleVector);
+         FActorSpawnParameters SpawnInfo;
+         SpawnInfo.Owner = this;
+
+         AActor* act = world->SpawnActor<AActor>(params.ActorClass, SpawnPosVector, FRotator(0, 0, 0), SpawnInfo);
+         act->SetActorScale3D(ScaleVector);
+         aAsteroidActors.Add(act);
+      }
    }
 }
+
+void AAsteroidClusterActor::PostInitializeComponents()
+{
+   Super::PostInitializeComponents();
+
+   UE_LOG(LogTemp, Log, TEXT("AAsteroidClusterActor::PostInitializeComponents()"));
+}
+
+void AAsteroidClusterActor::OnConstruction(const FTransform& transform)
+{
+   Super::OnConstruction(transform);
+}
+
+#if WITH_EDITOR  
+void AAsteroidClusterActor::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+   Spawn();
+
+   // Call the base class version  
+   Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+#endif

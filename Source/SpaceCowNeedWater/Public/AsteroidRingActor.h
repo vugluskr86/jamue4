@@ -2,10 +2,15 @@
 
 #pragma once
 
+#include<random>
+#include<cmath>
+#include<chrono>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "AsteroidRingActor.generated.h"
+
 
 USTRUCT(BlueprintType)
 struct FAsteroidInstancedSpawnParamsRing
@@ -16,9 +21,8 @@ struct FAsteroidInstancedSpawnParamsRing
    UPROPERTY(EditAnywhere) UMaterial* Material;
    UPROPERTY(EditAnywhere) int32 MinAsteroid;
    UPROPERTY(EditAnywhere) int32 MaxAsteroid;
-   UPROPERTY(EditAnywhere) float Radius;
-   UPROPERTY(EditAnywhere) float Radius2;
-   UPROPERTY(EditAnywhere) float Distance;
+   UPROPERTY(EditAnywhere) float OuterRadius;
+   UPROPERTY(EditAnywhere) float InnerRadius;
    UPROPERTY(EditAnywhere) float MinScale;
    UPROPERTY(EditAnywhere) float MaxScale;
 };
@@ -32,9 +36,8 @@ struct FAsteroidActorsSpawnParamsRing
    UPROPERTY(EditAnywhere) TSubclassOf<class AActor> ActorClass;
    UPROPERTY(EditAnywhere) int32 MinAsteroid;
    UPROPERTY(EditAnywhere) int32 MaxAsteroid;
-   UPROPERTY(EditAnywhere) float Radius;
-   UPROPERTY(EditAnywhere) float Radius2;
-   UPROPERTY(EditAnywhere) float Distance;
+   UPROPERTY(EditAnywhere) float OuterRadius;
+   UPROPERTY(EditAnywhere) float InnerRadius;
    UPROPERTY(EditAnywhere) float MinScale;
    UPROPERTY(EditAnywhere) float MaxScale;
 };
@@ -49,7 +52,12 @@ public:
 	AAsteroidRingActor();
 
 protected:
+   std::mt19937 generator;
+   std::uniform_real_distribution<double> uniform01;
 
+   FVector GetRandomPositionInTorus(double ringRadius, double wallRadius);
+
+   TArray<AActor*> aAsteroidActors;
    FRotator FRandomRotator();
 
    void SpawnInstanced(const FAsteroidInstancedSpawnParamsRing& options);
@@ -62,6 +70,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+#if WITH_EDITOR  
+   virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+   UPROPERTY(EditAnywhere) int32 Seed;
    UPROPERTY(EditAnywhere) TArray<FAsteroidInstancedSpawnParamsRing> InstancedSpawn;
    UPROPERTY(EditAnywhere) TArray<FAsteroidActorsSpawnParamsRing> ActorsSpawn;
    UFUNCTION(BlueprintCallable) void Spawn();
